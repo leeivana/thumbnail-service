@@ -8,6 +8,11 @@ import * as dbModels from "../../../src/db/models";
 import { jobStatuses } from "../../../src/types";
 
 jest.mock("../../../src/db/models");
+jest.mock("../../../src/worker/worker", () => ({
+    thumbnailQueue: {
+        add: jest.fn().mockResolvedValue({ id: "test-queue-id" }),
+    },
+}));
 
 const mockedDbModels = dbModels as jest.Mocked<typeof dbModels>;
 

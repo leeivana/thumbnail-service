@@ -6,6 +6,29 @@ import { makeDirectories } from "../../utils/fileStorage";
 import { IMAGE_PATH, THUMBNAIL_PATH, UPLOAD_PATH } from "../constants";
 import { initDb } from "../../db/database";
 
+// @NOTE: Mocking createJob tries to add a job to the thumbnailQueue
+// Therefore mocking out response
+jest.mock("../../worker/worker", () => ({
+    thumbnailQueue: {
+        add: jest.fn().mockResolvedValue({ id: "test-queue-id" }),
+    },
+}));
+
+// @NOTE: Mocking out db calls
+jest.mock("../../db/models", () => ({
+    getAllJobs: jest.fn().mockResolvedValue([
+        {
+            id: "Imjog7KcuFLRB3j8bV4Sp",
+            status: "processing",
+            originalFilename: "stitch.jpg",
+            storedFilename: "image-6GIyl89mTfkSUEzQvkxMB.jpg",
+        },
+    ]),
+    addJob: jest.fn(),
+    findJobById: jest.fn(),
+    updateJobById: jest.fn(),
+}));
+
 beforeEach(async () => {
     // @NOTE: Removing and re-creating directories to remove stale test data
     await fs.rm(UPLOAD_PATH, { recursive: true, force: true });
@@ -31,12 +54,22 @@ afterAll(async () => {
     });
 });
 
+describe("GET /jobs", () => {
+    it("should return a list of jobs", async () => {
+        const response = await request(app).get("/jobs");
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("jobs");
+        const { jobs } = response.body;
+        expect(Array.isArray(jobs)).toBe(true);
+        expect(jobs.length).toEqual(1);
+    });
+});
+
 describe("POST /jobs/upload", () => {
     it("should upload an image file and return jobId", async () => {
         const response = await request(app)
             .post("/jobs/upload")
             .attach("image", IMAGE_PATH);
-
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty("jobId");
     });
