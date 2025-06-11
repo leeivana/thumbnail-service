@@ -1,0 +1,28 @@
+{
+    "name": "thumbnail-job-api",
+    "version": "1.0.0",
+    "description": "An API to generate thumbnails using long-running jobs",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "dev": "ts-node src/index.ts"
+    },
+    "dependencies": {
+        "bullmq": "^5.53.2",
+        "express": "^5.1.0",
+        "ioredis": "^5.6.1",
+        "lowdb": "^7.0.1",
+        "multer": "^2.0.1",
+        "nanoid": "^5.1.5",
+        "sanitize-filename": "^1.6.3",
+        "sharp": "^0.34.2"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.21",
+        "@types/multer": "^1.4.7",
+        "@types/node": "^20.19.0",
+        "ts-node": "^10.9.1",
+        "typescript": "^5.3.3"
+    }
+}
