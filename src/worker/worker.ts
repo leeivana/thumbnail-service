@@ -7,16 +7,15 @@ import {
 } from "../constants";
 import sharp from "sharp";
 import { join } from "node:path";
-import { Low, JSONFile } from "lowdb";
-import Redis from "ioredis";
+import IORedis from "ioredis";
 import { jobStatuses, Schema } from "../types";
 import { updateJob } from "../jobs/job.service";
 
 // @NOTE: Redis connection
-const redis = new Redis();
+const connection = new IORedis({ maxRetriesPerRequest: null });
 
 // Setting up BullMQ queue
-export const thumbnailQueue = new Queue(THUMBNAIL_QUEUE, { connection: redis });
+export const thumbnailQueue = new Queue(THUMBNAIL_QUEUE, { connection });
 
 const worker = new Worker(
     THUMBNAIL_QUEUE,
@@ -45,7 +44,11 @@ const worker = new Worker(
             throw error;
         }
     },
-    { connection: redis }
+    { connection }
 );
 
-worker.on("failed", () => {});
+worker.on("failed", (job: Job | undefined, error) => {
+    console.log(`Job with id ${job?.id} failed with ${error.message}`);
+});
+
+export default worker;

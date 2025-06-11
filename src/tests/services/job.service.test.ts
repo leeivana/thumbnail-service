@@ -26,8 +26,9 @@ describe("Job Service", () => {
         });
 
         it("should return HttpError if filenames are missing", async () => {
-            const result = await createJob("", "");
-            expect(result).toHaveProperty("statusCode", 400);
+            await expect(createJob("", "")).rejects.toThrow(
+                "File names are required"
+            );
         });
     });
 
@@ -44,8 +45,9 @@ describe("Job Service", () => {
         });
 
         it("should return HttpError if id/status are missing", async () => {
-            const result = await updateJob({ id: "", status: "" as any });
-            expect(result).toHaveProperty("statusCode", 400);
+            await expect(
+                updateJob({ id: "", status: "" as any })
+            ).rejects.toThrow("Job Id and Status are required");
         });
     });
 

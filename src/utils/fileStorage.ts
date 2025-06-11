@@ -9,8 +9,14 @@ export const makeDirectories = async () => {
     try {
         await mkdir(UPLOAD_DIR, { recursive: true });
         await mkdir(THUMBNAIL_DIR, { recursive: true });
+
+        console.log("Successfully created directories");
     } catch (err) {
-        console.error("Failed to create thumbnail / upload directories");
+        console.error("Failed to create directories:", {
+            error: err,
+            uploadDir: UPLOAD_DIR,
+            thumbnailDir: THUMBNAIL_DIR,
+        });
         throw err;
     }
 };

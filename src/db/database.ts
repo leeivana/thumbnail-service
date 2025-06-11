@@ -1,15 +1,29 @@
 import { Low, JSONFile } from "lowdb";
-import { join } from "path";
+import { join, dirname } from "path";
 import { Schema } from "../types";
+import { mkdir } from "fs/promises";
 
 const dbFile = join(__dirname, "../../db.json");
+
+const verifyCreateDatabaseFile = async () => {
+    try {
+        await mkdir(dirname(dbFile), { recursive: true });
+
+        try {
+            await db.read();
+        } catch (error) {
+            db.data = { jobs: [] };
+            await db.write();
+        }
+    } catch (error) {
+        console.error("Failed to initialize database:", error);
+        throw error;
+    }
+};
+
 export const db = new Low<Schema>(new JSONFile<Schema>(dbFile));
 
 export const initDb = async () => {
-    // @NOTE: Ensuring database is initialized
-    await db.read();
-    if (!db.data) {
-        db.data = { jobs: [] };
-        await db.write();
-    }
+    await verifyCreateDatabaseFile();
+    console.log("Database initialized successfully");
 };
