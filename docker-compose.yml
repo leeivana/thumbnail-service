@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+    app:
+        build: .
+        container_name: thumbnail-api
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./uploads:/app/uploads
+            - ./thumbnails:/app/thumbnails
+            - ./db.json:/app/db.json
+        depends_on:
+            - redis
+        environment:
+            - REDIS_URL=redis://redis:6379
+        restart: unless-stopped
+        user: "node"
+
+    redis:
+        image: redis:7-alpine
+        container_name: redis
+        volumes:
+            - redis_data:/data
+        restart: unless-stopped
+
+volumes:
+    redis_data:
