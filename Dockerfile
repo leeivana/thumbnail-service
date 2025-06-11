@@ -1,27 +1,21 @@
-FROM node:20-alpine AS builder
-# Install build dependencies for Sharp compilation
-RUN apk add --no-cache python3 make g++ jpeg-dev cairo-dev giflib-dev pango-dev
+FROM node:20-alpine
+
 WORKDIR /app
+
 COPY package*.json ./
 RUN npm install
-COPY tsconfig.json ./
-COPY src ./src
+
+COPY . .
 RUN npm run build
 
-FROM node:20-alpine
-# Install runtime dependencies for Sharp
-RUN apk add --no-cache jpeg-dev cairo-dev giflib-dev pango-dev
-WORKDIR /app
-COPY package*.json ./
-RUN npm install --only=production
-COPY --from=builder /app/dist ./dist
+RUN mkdir -p uploads thumbnails data && \
+    touch data/db.json && \
+    chown -R node:node /app && \
+    chmod 755 uploads thumbnails data && \
+    chmod 644 data/db.json
 
-# Create directories and set permissions
-RUN mkdir -p uploads thumbnails && \
-    chown -R node:node uploads thumbnails
-
-# Switch to non-root user
 USER node
 
 EXPOSE 3000
-CMD ["node", "dist/index.js"]
+
+CMD ["node", "dist/server.js"]
