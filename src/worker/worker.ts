@@ -8,11 +8,34 @@ import {
 import sharp from "sharp";
 import { join } from "node:path";
 import IORedis from "ioredis";
-import { jobStatuses, Schema } from "../types";
+import { jobStatuses } from "../types";
 import { updateJob } from "../jobs/job.service";
 
-// @NOTE: Redis connection
-const connection = new IORedis({ maxRetriesPerRequest: null });
+// @NOTE: Redis connection with retry logic
+const connection = new IORedis(process.env.REDIS_URL || "redis://redis:6379", {
+    // @NOTE: Exponential backoff strategy
+    // Waiting longer to reconnect if there is a failure
+    retryStrategy: (times: number) => {
+        const delay = Math.min(times * 50, 2000);
+        return delay;
+    },
+    reconnectOnError: (err) => {
+        const targetError = "READONLY";
+        if (err.message.includes(targetError)) {
+            return true;
+        }
+        return false;
+    },
+    maxRetriesPerRequest: null,
+});
+
+connection.on("error", (err) => {
+    console.error("Redis connection error:", err);
+});
+
+connection.on("connect", () => {
+    console.log("Successfully connected to Redis");
+});
 
 // Setting up BullMQ queue
 export const thumbnailQueue = new Queue(THUMBNAIL_QUEUE, { connection });

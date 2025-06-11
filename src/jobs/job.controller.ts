@@ -7,11 +7,19 @@ import { THUMBNAIL_DIR } from "../constants";
 import { access } from "fs/promises";
 import { asyncHandler } from "../utils/asyncHandler";
 import { HttpError } from "../errors/httpError";
+import {
+    apiLimiter,
+    uploadLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 export const jobRouter = express.Router();
 
+// @NOTE: Applying rate limiter to routes
+jobRouter.use(apiLimiter);
+
 jobRouter.post(
     "/upload",
+    uploadLimiter, // @NOTE: Specific rate limiter for upload limits
     upload.single("image"),
     asyncHandler(async (req: Request, res: Response) => {
         if (!req.file) {

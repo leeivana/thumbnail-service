@@ -3,11 +3,12 @@ import { join, dirname } from "path";
 import { Schema } from "../types";
 import { mkdir } from "fs/promises";
 
-const dbFile = join(__dirname, "../../db.json");
+const dbDir = join(__dirname, "../../data");
+const dbFile = join(dbDir, "db.json");
 
 const verifyCreateDatabaseFile = async () => {
     try {
-        await mkdir(dirname(dbFile), { recursive: true });
+        await mkdir(dbDir, { recursive: true });
 
         try {
             await db.read();

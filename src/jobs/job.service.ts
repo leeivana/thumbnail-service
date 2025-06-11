@@ -2,6 +2,7 @@ import { nanoid } from "nanoid";
 import { addJob, findJobById, getAllJobs, updateJobById } from "../db/models";
 import { JobData, JobStatuses, jobStatuses } from "../types";
 import { HttpError } from "../errors/httpError";
+import { thumbnailQueue } from "../worker/worker";
 
 export const createJob = async (
     originalFilename: string,
@@ -18,6 +19,12 @@ export const createJob = async (
         storedFilename,
     };
     await addJob(job);
+
+    await thumbnailQueue.add("thumbnail", {
+        jobId: job.id,
+        storedFileName: storedFilename,
+    });
+
     return job.id;
 };
 
