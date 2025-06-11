@@ -178,9 +178,7 @@ Sharp is used for:
 
 **Storage**
 
-   For storage, I decided to use LowDB for job metadata and file system storage for images and generated thumbnails. This is due to simpilicity and performance. Storing files directly in the file system has very little setup and no external storage or extra dependencies are necessary.
-
-    Given the scope of the assignment I thought it would be a good fit.
+   For storage, I decided to use LowDB for job metadata and file system storage for images and generated thumbnails. This is due to simpilicity and performance. Storing files directly in the file system has very little setup and no external storage or extra dependencies are necessary. Given the scope of the assignment I thought it would be a good fit.
 
 ## Trade-offs, Limitations and Future Improvements
 
