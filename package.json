@@ -7,7 +7,7 @@
         "build": "tsc",
         "start": "node dist/index.js",
         "dev": "ts-node src/index.ts",
-        "test": "jest"
+        "test": "MAX_FILE_SIZE=10240 jest"
     },
     "dependencies": {
         "bullmq": "^5.53.2",

@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { upload } from "../utils/fileStorage";
+import { upload, handleMulterError } from "../utils/fileStorage";
 import { createJob, getJobById, getJobs } from "./job.service";
 import { jobStatuses } from "../types";
 import { join } from "path";
@@ -21,6 +21,7 @@ jobRouter.post(
     "/upload",
     uploadLimiter, // @NOTE: Specific rate limiter for upload limits
     upload.single("image"),
+    handleMulterError,
     asyncHandler(async (req: Request, res: Response) => {
         if (!req.file) {
             throw new HttpError(400, "Image file is required");

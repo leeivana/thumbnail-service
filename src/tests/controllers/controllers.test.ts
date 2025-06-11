@@ -2,12 +2,11 @@ import request from "supertest";
 import { app } from "../../app";
 import path from "path";
 import fs from "fs/promises";
-import { makeDirectories } from "../../utils/fileStorage";
 import { IMAGE_PATH, THUMBNAIL_PATH, UPLOAD_PATH } from "../constants";
 import { initDb } from "../../db/database";
 
 // @NOTE: Mocking createJob tries to add a job to the thumbnailQueue
-// Therefore mocking out response
+// Therefore mocking worker
 jest.mock("../../worker/worker", () => ({
     thumbnailQueue: {
         add: jest.fn().mockResolvedValue({ id: "test-queue-id" }),
@@ -26,24 +25,26 @@ jest.mock("../../db/models", () => ({
     ]),
     addJob: jest.fn(),
     findJobById: jest.fn(),
-    updateJobById: jest.fn(),
 }));
 
 beforeEach(async () => {
     // @NOTE: Removing and re-creating directories to remove stale test data
     await fs.rm(UPLOAD_PATH, { recursive: true, force: true });
     await fs.rm(THUMBNAIL_PATH, { recursive: true, force: true });
-    await makeDirectories();
+    await fs.mkdir(UPLOAD_PATH, { recursive: true });
+    await fs.mkdir(THUMBNAIL_PATH, { recursive: true });
     await initDb();
     try {
         await fs.access(IMAGE_PATH);
     } catch (error) {
-        throw new Error(`Test image not found at ${IMAGE_PATH}`);
+        throw new Error(
+            "Test image not found. Please ensure the test image exists at the specified path."
+        );
     }
 });
 
-afterAll(async () => {
-    // @NOTE: Clean up after all tests
+afterEach(async () => {
+    // @NOTE: Cleanup after each test
     await fs.rm(UPLOAD_PATH, {
         recursive: true,
         force: true,

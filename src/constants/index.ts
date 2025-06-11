@@ -1,7 +1,9 @@
 import { join, dirname } from "path";
 
 export const THUMBNAIL_QUEUE = "thumbnail-queue";
-export const MAX_FILE_SIZE = 10 * 1024 * 1024;
+export const MAX_FILE_SIZE = process.env.MAX_FILE_SIZE
+    ? parseInt(process.env.MAX_FILE_SIZE)
+    : 10 * 1024 * 1024; // @NOTE: Default at 10MB
 
 const PROJECT_ROOT = join(dirname(__dirname), "..");
 

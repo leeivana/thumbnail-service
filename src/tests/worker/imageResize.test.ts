@@ -2,8 +2,9 @@ import fs from "fs/promises";
 import path from "path";
 import sharp from "sharp";
 import { jobStatuses } from "../../types";
-import { THUMBNAIL_DIR, UPLOAD_DIR, THUMBNAIL_SIZE } from "../../constants";
+import { THUMBNAIL_SIZE } from "../../constants";
 import { updateJob } from "../../jobs/job.service";
+import { UPLOAD_PATH, THUMBNAIL_PATH } from "../constants";
 
 // @NOTE: Mocking sharp implementation
 jest.mock("sharp", () => {
@@ -35,19 +36,19 @@ describe("Image Resize Logic", () => {
     const testStoredFileName = "test-image.jpg";
 
     beforeAll(async () => {
-        await fs.mkdir(THUMBNAIL_DIR, { recursive: true });
+        await fs.mkdir(THUMBNAIL_PATH, { recursive: true });
     });
 
     afterAll(async () => {
         // @NOTE: Cleanup (remove directory)
-        await fs.rm(THUMBNAIL_DIR, { recursive: true, force: true });
+        await fs.rm(THUMBNAIL_PATH, { recursive: true, force: true });
     });
 
     it("should resize image and update job status", async () => {
         const thumbnailFilename = `${testJobId}.png`;
-        const thumbnailPath = path.join(THUMBNAIL_DIR, thumbnailFilename);
+        const thumbnailPath = path.join(THUMBNAIL_PATH, thumbnailFilename);
 
-        const sharpInstance = sharp(path.join(UPLOAD_DIR, testStoredFileName));
+        const sharpInstance = sharp(path.join(UPLOAD_PATH, testStoredFileName));
         await sharpInstance
             .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE)
             .png()
@@ -65,7 +66,7 @@ describe("Image Resize Logic", () => {
 
         // @NOTE: Verify that sharp was called correctly w/ correct arguments
         expect(sharp).toHaveBeenCalledWith(
-            path.join(UPLOAD_DIR, testStoredFileName)
+            path.join(UPLOAD_PATH, testStoredFileName)
         );
         expect(sharpInstance.resize).toHaveBeenCalledWith(
             THUMBNAIL_SIZE,
