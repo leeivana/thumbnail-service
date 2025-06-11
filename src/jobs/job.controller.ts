@@ -6,7 +6,7 @@ import { join } from "path";
 import { THUMBNAIL_DIR } from "../constants";
 import { access } from "fs/promises";
 import { asyncHandler } from "../utils/asyncHandler";
-import { HttpError } from "../errors/HttpError";
+import { HttpError } from "../errors/httpError";
 
 export const jobRouter = express.Router();
 

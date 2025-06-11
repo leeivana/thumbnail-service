@@ -7,8 +7,7 @@ import {
 } from "../constants";
 import sharp from "sharp";
 import { join } from "node:path";
-import { JSONFile } from "lowdb/node";
-import { Low } from "lowdb";
+import { Low, JSONFile } from "lowdb";
 import Redis from "ioredis";
 import { jobStatuses, Schema } from "../types";
 import { updateJob } from "../jobs/job.service";
@@ -18,9 +17,6 @@ const redis = new Redis();
 
 // Setting up BullMQ queue
 export const thumbnailQueue = new Queue(THUMBNAIL_QUEUE, { connection: redis });
-
-const dbFile = join(__dirname, "./db.json");
-const db = new Low<Schema>(new JSONFile<Schema>(dbFile), { jobs: [] });
 
 const worker = new Worker(
     THUMBNAIL_QUEUE,

@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { addJob, findJobById, getAllJobs, updateJobById } from "../db/models";
 import { JobData, JobStatuses, jobStatuses } from "../types";
-import { HttpError } from "../errors/HttpError";
+import { HttpError } from "../errors/httpError";
 
 export const createJob = async (
     originalFilename: string,
